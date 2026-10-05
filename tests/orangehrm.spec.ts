@@ -40,3 +40,26 @@ test('successfully logs in with valid credentials', async ({ page }) => {
   // 4. Sprawdź, czy widoczny jest nagłówek Dashboard
   await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 });
+
+test('successfully logs out', async ({ page }) => {
+  // 1. Zaloguj się jako Admin / admin123
+  await page.getByPlaceholder('Username').fill('Admin');
+  await page.getByPlaceholder('Password').fill('admin123');
+  await page.getByRole('button', { name: 'Login' }).click();
+
+  // 2. Potwierdź, że jesteśmy na Dashboardzie
+  await expect(page).toHaveURL(/dashboard/);
+  await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+
+  // 3. Otwórz menu użytkownika w prawym górnym rogu (CSS locator)
+  await page.locator('.oxd-userdropdown-tab').click();
+
+  // 4. Kliknij Logout
+  await page.getByText('Logout', { exact: true }).click();
+
+  // 5. Sprawdź, że wróciliśmy na /auth/login
+  await expect(page).toHaveURL(/.*auth\/login/);
+
+  // 6. Sprawdź, że znowu widoczny jest przycisk Login
+  await expect(page.getByRole('button', { name: 'Login' })).toBeVisible();
+});
