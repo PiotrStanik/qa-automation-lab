@@ -25,3 +25,18 @@ test('shows required validation when login form is empty', async ({ page }) => {
   const requiredLabels = page.getByText('Required', { exact: true });
   await expect(requiredLabels).toHaveCount(2);
 });
+
+test('successfully logs in with valid credentials', async ({ page }) => {
+  // 1. Wpisz dane demonstracyjne podane przez OrangeHRM
+  await page.getByPlaceholder('Username').fill('Admin');
+  await page.getByPlaceholder('Password').fill('admin123');
+
+  // 2. Kliknij Login
+  await page.getByRole('button', { name: 'Login' }).click();
+
+  // 3. Sprawdź, czy użytkownik trafia do /dashboard
+  await expect(page).toHaveURL(/dashboard/);
+
+  // 4. Sprawdź, czy widoczny jest nagłówek Dashboard
+  await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+});
