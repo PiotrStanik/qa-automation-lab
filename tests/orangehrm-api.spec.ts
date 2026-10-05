@@ -36,3 +36,21 @@ test('returns shortcuts data for authenticated session', async ({ page, context 
   expect(body.data['leave.apply_leave']).toBe(true);
   expect(body.data['time.my_timesheet']).toBe(true);
 });
+
+test('returns expected error structure for unauthenticated request', async ({ request }) => {
+  const response = await request.get(
+    'https://opensource-demo.orangehrmlive.com/web/index.php/api/v2/dashboard/shortcuts'
+  );
+
+  expect(response.status()).toBe(401);
+  expect(response.headers()['content-type']).toContain('application/json');
+
+  const body = await response.json();
+
+  expect(body).toHaveProperty('error');
+  expect(body.error).toHaveProperty('status');
+  expect(body.error).toHaveProperty('message');
+
+  expect(typeof body.error.status).toBe('number');
+  expect(typeof body.error.message).toBe('string');
+});
