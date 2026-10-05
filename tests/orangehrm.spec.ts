@@ -63,3 +63,28 @@ test('successfully logs out', async ({ page }) => {
   // 6. Sprawdź, że znowu widoczny jest przycisk Login
   await expect(page.getByRole('button', { name: 'Login' })).toBeVisible();
 });
+
+test('redirects to login when accessing dashboard after logout', async ({ page }) => {
+  // 1. Zaloguj się jako Admin / admin123
+  await page.getByPlaceholder('Username').fill('Admin');
+  await page.getByPlaceholder('Password').fill('admin123');
+  await page.getByRole('button', { name: 'Login' }).click();
+
+  // 2. Potwierdź Dashboard
+  await expect(page).toHaveURL(/dashboard/);
+
+  // 3. Wyloguj się
+  await page.locator('.oxd-userdropdown-tab').click();
+  await page.getByText('Logout', { exact: true }).click();
+
+ // 4. Spróbuj wejść bezpośrednio na chroniony Dashboard
+await page.goto(
+  'https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index'
+);
+
+// 5. Sprawdź, czy aplikacja przekierowała na login
+await expect(page).toHaveURL(/auth\/login/);
+
+// 6. Potwierdź obecność formularza logowania
+await expect(page.getByRole('button', { name: 'Login' })).toBeVisible();
+});
